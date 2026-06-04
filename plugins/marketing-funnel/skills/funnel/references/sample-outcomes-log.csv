@@ -1,0 +1,6 @@
+date,lever,method,predicted_rev,predicted_profit,target,metric_before,metric_after,actual_rev_delta,owner,status
+2026-03-01,checkout,exact,170000,59500,0.72,0.60,0.66,85000,low-ticket.md,closed
+2026-03-01,attach,prior,55987,19595,0.15,0.05,0.09,42000,post-purchase.md,closed
+2026-04-01,checkout,exact,150000,52500,0.72,0.64,0.69,95000,low-ticket.md,closed
+2026-04-01,reach,prior,68276,3897,800000,500000,640000,41000,/ads,closed
+2026-06-02,repeat_rate,prior,150000,52500,0.27,0.18,,,email-sms.md,open

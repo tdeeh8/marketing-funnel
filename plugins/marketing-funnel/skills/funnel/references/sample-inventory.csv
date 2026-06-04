@@ -1,0 +1,10 @@
+entity_id,type,name,attrs
+c1,meta_campaign,Cold-Prospecting-Broad,active_creatives=4;frequency=3.4;audience=25-34 LAL
+c2,meta_campaign,Retargeting-30d,active_creatives=3;frequency=5.1
+c3,meta_campaign,Advantage-Shopping,active_creatives=6;status=active
+f1,klaviyo_flow,Welcome Series,status=on
+f2,klaviyo_flow,Abandoned Checkout,status=on
+f3,klaviyo_flow,Win-back,status=off
+f4,klaviyo_flow,Replenishment,status=missing
+o1,shopify_offer,Single SKU,type=base
+o2,shopify_offer,Starter Bundle,type=bundle;count=1

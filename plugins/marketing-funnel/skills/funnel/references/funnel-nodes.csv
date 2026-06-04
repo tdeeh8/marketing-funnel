@@ -1,0 +1,89 @@
+id,label,layer,definition
+tof_spend,Prospecting spend,TOF,Budget pushed to cold / new audiences.
+impressions,Impressions,TOF,Total ad views served.
+reach,Reach (unique),TOF,Unique people reached.
+frequency,Frequency,TOF,Avg impressions per person; too high = fatigue.
+cpm,CPM,TOF,"Cost per 1,000 impressions; efficiency of reach."
+pct_new,% new reach,TOF,Share of delivery to never-reached audiences.
+cre_vol,Creative volume,TOF,Count of active distinct concepts.
+cre_div,Creative diversity,TOF,Spread of angles & formats in rotation.
+hook,Hook rate,TOF,3-second view %; opening strength.
+hold,Hold rate,TOF,Thruplay / retention through the ad.
+watch,Watch time,TOF,Avg seconds viewed.
+ctr,Ad CTR,TOF,Click-through rate on ads.
+cpc,CPC,TOF,Cost per click.
+lpv_rate,Landing-page-view rate,TOF,Clicks that actually load the page.
+nvs,New-visitor sessions,TOF,First-time visits.
+organic,Organic sessions,TOF,"Non-paid, non-branded traffic."
+brand,Branded search,TOF,Searches for the brand name (KEYSTONE).
+direct,Direct traffic,TOF,Type-in / bookmark visits (KEYSTONE).
+referral,Referral traffic,TOF,Visits from other sites & links.
+follow,Follower growth,TOF,Net new social followers.
+sov,Share of voice,TOF,Brand mention share vs category.
+ugc_reach,UGC / influencer reach,TOF,Reach from creators & user content.
+lpv,Landing page views,MOF,Sessions that load a landing/entry page.
+bounce,Bounce rate,MOF,Single-engagement exits (NEGATIVE).
+eng_rate,Engagement rate,MOF,Sessions with meaningful interaction.
+pages_sess,Pages per session,MOF,Depth of browsing.
+eng_time,Avg engaged time,MOF,Time actively on site.
+pdp_views,Product page views,MOF,PDP load count.
+pdp_rate,PDP view rate,MOF,Sessions reaching a product page.
+atc_rate,Add-to-cart rate,MOF,PDP to ATC; first hard intent.
+atc_vol,Add-to-cart volume,MOF,Count of add-to-carts.
+email_cap,Email capture rate,MOF,Sessions converted to email subscriber.
+sms_cap,SMS opt-in rate,MOF,Sessions converted to SMS subscriber.
+quiz,Quiz completion,MOF,Guided-selling quiz finishers.
+lead_mag,Lead-magnet uptake,MOF,Downloads / incentives claimed.
+list_growth,List growth rate,MOF,Net new subscribers / week (KEYSTONE).
+list_size,List size,MOF,Total active subscribers.
+deliver,Deliverability,MOF,Inbox placement / sender health.
+open_rate,Email open rate,MOF,Opens / sends.
+click_rate,Email click rate,MOF,Clicks / sends.
+flow_ctr,Flow click rate,MOF,Automated-flow engagement.
+rvr,Returning-visitor rate,MOF,Share of sessions that are returns.
+rtg_pool,Retargeting pool,MOF,Warm re-marketable audience size (KEYSTONE).
+bis,Back-in-stock / wishlist,MOF,Saved-intent signups.
+ic_rate,Initiate-checkout rate,BOF,ATC to checkout start.
+checkout,Checkout completion,BOF,Checkout start to purchase.
+cart_aband,Cart abandonment,BOF,Carts not completed (NEGATIVE).
+co_aband,Checkout abandonment,BOF,Checkout starts not completed (NEGATIVE).
+cvr,Sitewide CVR,BOF,Sessions to orders.
+new_cvr,New-visitor CVR,BOF,Conversion of first-timers.
+ret_cvr,Returning-visitor CVR,BOF,Conversion of return visitors.
+mob_cvr,Mobile CVR,BOF,Conversion on mobile (usually the drag).
+rtcvr,Retarget / branded CVR,BOF,Conversion of warm traffic.
+pay_success,Payment success rate,BOF,Completed payments vs failures.
+site_speed,Site speed (LCP),BOF,Load performance; slow = lost orders.
+trust,Trust / review rating,BOF,Social proof & credibility on-site.
+express_co,Express checkout rate,BOF,One-click / accelerated checkout use.
+aov,AOV,AOV,Average order value.
+upo,Units per order,AOV,Items per transaction.
+asp,Avg selling price,AOV,Average price per unit.
+attach,Cross-sell attach rate,AOV,Added complementary items.
+upsell,Upsell take rate,AOV,Accepted upsells incl. post-purchase.
+bundle,Bundle adoption,AOV,Orders taking bundle offers.
+sub_attach,Subscription attach,AOV,First orders choosing subscribe.
+ship_gap,Free-ship threshold offer,AOV,Threshold nudging basket size up.
+bnpl,BNPL adoption,AOV,Buy-now-pay-later usage.
+discount,Discount depth,AOV,"Promo intensity (lifts CVR/AOV, cuts margin)."
+gwp,Gift-with-purchase,AOV,GWP offer uptake.
+repeat_rate,Repeat purchase rate,Retention,% of customers ordering again.
+freq,Purchase frequency,Retention,Orders per customer per period.
+ibt,Time between orders,Retention,Latency to next order (lower = better).
+ltv,Customer LTV,Retention,Lifetime value per customer.
+rep_30_90,30/60/90-day repeat,Retention,Early repeat-purchase cohorts.
+sub_active,Active subscriptions,Retention,Live subscription count.
+sub_churn,Subscription churn,Retention,Cancelled subscriptions (NEGATIVE).
+winback,Reactivation rate,Retention,Lapsed customers won back.
+pp_flow_rev,Post-purchase flow revenue,Retention,Lifecycle email/SMS revenue.
+loyalty,Loyalty participation,Retention,Active loyalty / points members.
+referral_rate,Referral rate,Retention,Customers referring others.
+review_rate,Review submission rate,Retention,UGC / reviews generated.
+return_rate,Return / refund rate,Retention,Returned orders (NEGATIVE).
+replenish,Replenishment rate,Retention,Consumable re-order behavior.
+nps,NPS / CSAT,Retention,Satisfaction & advocacy.
+sessions,Sessions,Spine,Total visits = sum of all sources.
+cvr_id,CVR (identity),Spine,Conversion multiplier.
+orders,Orders,Spine,Sessions x CVR.
+ret_rev,Returning revenue,Spine,Returning orders x AOV.
+revenue,REVENUE,Revenue,Total revenue (source of truth).

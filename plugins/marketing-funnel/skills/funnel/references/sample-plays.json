@@ -1,0 +1,56 @@
+[
+  {
+    "lever": "attach", "primary": true,
+    "text": "No cross-sell on cart today; add a 'frequently bought with' block on PDP + cart against the Single SKU pages.",
+    "owner": "post-purchase.md",
+    "referenced_entities": ["Single SKU"],
+    "grounded": true,
+    "target_metric": "attach", "intermediate_metric": "aov", "outcome_metric": "revenue",
+    "why": "More cross-sell adds units per order, which raises AOV — and AOV is a direct multiplier of revenue."
+  },
+  {
+    "lever": "bundle", "primary": true,
+    "text": "Only the Starter Bundle is live; add a 'refill 2-pack' and a 'family 3-pack' and set bundle as the default PDP variant.",
+    "owner": "low-ticket.md",
+    "referenced_entities": ["Starter Bundle"],
+    "grounded": true,
+    "target_metric": "bundle", "intermediate_metric": "aov", "outcome_metric": "revenue",
+    "why": "Bundle adoption raises units per order and AOV; AOV multiplies revenue."
+  },
+  {
+    "lever": "upsell", "primary": true,
+    "text": "No post-purchase upsell exists; add a 1-click refill upsell on the order-status page.",
+    "owner": "post-purchase.md",
+    "referenced_entities": [],
+    "grounded": true,
+    "target_metric": "upsell", "intermediate_metric": "aov", "outcome_metric": "revenue",
+    "why": "Accepted upsells raise AOV without added ad spend; AOV multiplies revenue."
+  },
+  {
+    "lever": "repeat", "primary": true,
+    "text": "The Win-back flow is off; turn on a 45-day lapsed flow with a refill incentive.",
+    "owner": "email-sms.md",
+    "referenced_entities": ["Win-back"],
+    "grounded": true,
+    "target_metric": "repeat_rate", "intermediate_metric": "ret_rev", "outcome_metric": "revenue",
+    "why": "Reactivating lapsed buyers lifts repeat-purchase rate, which feeds returning revenue and thus total revenue."
+  },
+  {
+    "lever": "ltv", "primary": true,
+    "text": "No Replenishment flow is built; add a 25-day refill reminder flow in Klaviyo.",
+    "owner": "email-sms.md",
+    "referenced_entities": ["Replenishment"],
+    "grounded": true,
+    "target_metric": "ltv", "intermediate_metric": "ret_rev", "outcome_metric": "revenue",
+    "why": "Replenishment shortens time-between-orders and raises LTV, which feeds returning revenue."
+  },
+  {
+    "lever": "reach", "primary": true,
+    "text": "Cold-Prospecting-Broad runs 4 creatives at frequency 3.4; add 6 UGC hooks and a no-LAL broad audience to refresh delivery and lower CPM.",
+    "owner": "/ads brief",
+    "referenced_entities": ["Cold-Prospecting-Broad"],
+    "grounded": true,
+    "target_metric": "reach", "intermediate_metric": "nvs", "outcome_metric": "revenue",
+    "why": "Fresh creative and a broader audience lift cheap reach and new-visitor sessions, which feed sessions, orders, and revenue."
+  }
+]

@@ -1,0 +1,13 @@
+{
+  "name": "marketing-funnel",
+  "owner": {
+    "name": "Tanner Hill"
+  },
+  "plugins": [
+    {
+      "name": "marketing-funnel",
+      "source": "./plugins/marketing-funnel",
+      "description": "Whole-funnel revenue/profit lever prioritizer for DTC ecommerce with built-in anti-hallucination grounding."
+    }
+  ]
+}

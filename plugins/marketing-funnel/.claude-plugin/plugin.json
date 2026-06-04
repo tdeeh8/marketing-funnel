@@ -1,0 +1,9 @@
+{
+  "name": "marketing-funnel",
+  "version": "1.0.0",
+  "description": "Whole-funnel revenue/profit lever prioritizer for DTC ecommerce. Pulls live metrics (Databox, Triple Whale, GA4, Klaviyo, Meta), scores every funnel lever by Headroom x Sensitivity, and returns the biggest lever for long-run revenue and profit with graph-verified causal chains and grounded plays. A verification gate blocks any ungrounded number, dollar, or claim.",
+  "author": {
+    "name": "Tanner Hill"
+  },
+  "keywords": ["funnel", "dtc", "ecommerce", "growth", "marketing", "revenue", "prioritization", "databox", "shopify", "ga4", "meta-ads"]
+}
