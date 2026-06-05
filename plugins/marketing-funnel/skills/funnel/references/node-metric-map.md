@@ -17,21 +17,23 @@ The naive hook rate (`3-sec views ÷ all impressions`) is wrong because the deno
 
 **Benchmark video levers against the account's OWN best ad, not an industry number.** The industry "hook 25%" anchor assumes 3-sec views; when only p25 (25%-watched) is available the two aren't comparable, and scoring p25 against a 3-sec benchmark is wrong. Instead set the benchmark for `hook`/`hold`/`watch` to the account's **best-performing video ad** for that metric (from the ad-level pull). This is more honest ("you already hit 46.7% on one ad, you average 11.3%") and more actionable than a generic ceiling.
 
-**Per-ad misallocation is usually the real lever (compute it, don't eyeball it).** The account-level hook average hides the money. Build the ad-level table (impressions, hook, hold per video ad) and look for **high-delivery / low-hook** ads: budget concentrated on a weak-hook creative while a proven high-hook ad is starved. That delivery×hook mismatch is the lever — generate it as the primary play for the `hook` node (reallocate spend toward proven scroll-stoppers; no new creative, no added spend). Live example (outdoor-furniture brand, May 2026): one video ad took ~48% of video delivery at a 2.8% hook while another hooked 46.7%.
+**Per-ad misallocation is usually the real lever (compute it, don't eyeball it).** The account-level hook average hides the money. Build the ad-level table (impressions, hook, hold per video ad) and look for **high-delivery / low-hook** ads: budget concentrated on a weak-hook creative while a proven high-hook ad is starved. That delivery×hook mismatch is the lever — generate it as the primary play for the `hook` node (reallocate spend toward proven scroll-stoppers; no new creative, no added spend). Live example: one account's top-spend video took ~48% of video delivery at a 2.8% hook while a lower-budget creative hooked 46.7%.
 
 **Denominator warning for `cvr` / sessions-based rates:** never use raw GA4 sessions as the conversion denominator when the site has non-shopping traffic (software/community/app). Use the Shopify checkout funnel instead and flag sessions as polluted (see grounding-rules.md).
 
-Sources: DBX = Databox, TW = Triple Whale (moby), GA4, KLV = Klaviyo, META = Meta Ads MCP, SW = SimilarWeb/Ahrefs (optional).
+**Snapshot-only (cannot be backfilled; live pulls only):** `rtg_pool`, `list_size`, `follow`, `cre_vol`, `sub_active` — these nodes measure a count at the moment of the pull (warm audience size, active profiles, follower count, active creatives, active subscriptions). There is no historically accurate value for a past week. In backfill mode, record them as `current=DATA_NOT_AVAILABLE, measured=0, source=SNAPSHOT_ONLY: live-only metric`. Live weekly runs record them normally.
+
+Sources: DBX = Databox (Shopify, GA4, FbAds, GoogleAdwords, Klaviyo connectors), META = Meta Ads MCP. Hard rule: these two MCPs only — no Triple Whale, no direct Klaviyo, no SimilarWeb/Ahrefs.
 
 ## Identity spine & output
 | id | label | source | example metric | good dir |
 |---|---|---|---|---|
-| revenue | REVENUE | TW / DBX (Shopify) | total_revenue | higher |
-| orders | Orders | TW / Shopify | orders | higher |
+| revenue | REVENUE | DBX (Shopify) | total_revenue | higher |
+| orders | Orders | DBX (Shopify) | orders | higher |
 | sessions | Sessions | GA4 | sessions | higher |
 | cvr_id / cvr | Sitewide CVR | GA4 / Shopify | conversion_rate | higher |
-| aov | AOV | TW / Shopify | average_order_value | higher |
-| ret_rev | Returning revenue | TW | returning_customer_revenue | higher |
+| aov | AOV | DBX (Shopify) | average_order_value | higher |
+| ret_rev | Returning revenue | DBX (Shopify) | returning-customer sales (resolve exact key via Databox `list_metrics`) | higher |
 
 ## TOF — demand creation
 | id | label | source | metric | good dir |
@@ -42,7 +44,7 @@ Sources: DBX = Databox, TW = Triple Whale (moby), GA4, KLV = Klaviyo, META = Met
 | frequency | Frequency | META | frequency | lower |
 | cpm | CPM | DBX/META | cpm | lower |
 | pct_new | % new reach | META | % new audience | higher |
-| cre_vol | Creative volume | META | # active ads (distinct) | higher |
+| cre_vol | Creative volume | META | # active ads (distinct) `(snapshot-only)` | higher |
 | cre_div | Creative diversity | META (qual) | Andromeda diversity | higher |
 | hook | Hook rate | META (derive) | 2-sec-cont ÷ video impr (see Video block) | higher |
 | hold | Hold rate | META (derive) | ThruPlays ÷ video impr (see Video block) | higher |
@@ -52,11 +54,11 @@ Sources: DBX = Databox, TW = Triple Whale (moby), GA4, KLV = Klaviyo, META = Met
 | lpv_rate | LP-view rate | META | lpv / link_clicks | higher |
 | nvs | New-visitor sessions | GA4 | new_users sessions | higher |
 | organic | Organic sessions | GA4 | organic_sessions | higher |
-| brand | Branded search | GA4/GSC/SW | branded_search_clicks | higher |
+| brand | Branded search | GA4/GSC | branded_search_clicks | higher |
 | direct | Direct traffic | GA4 | direct_sessions | higher |
 | referral | Referral traffic | GA4 | referral_sessions | higher |
-| follow | Follower growth | DBX (social) | net_follower_growth | higher |
-| sov | Share of voice | SW/Ahrefs (qual) | share_of_voice | higher |
+| follow | Follower growth | DBX (social) | net_follower_growth `(snapshot-only)` | higher |
+| sov | Share of voice | none (optional tool not in stack) | DATA_NOT_AVAILABLE — SimilarWeb/Ahrefs not in the allowed source stack; flag if needed | higher |
 | ugc_reach | UGC / influencer reach | DBX/manual (qual) | creator_reach | higher |
 
 ## MOF — capture & nurture
@@ -71,19 +73,19 @@ Sources: DBX = Databox, TW = Triple Whale (moby), GA4, KLV = Klaviyo, META = Met
 | pdp_rate | PDP view rate | GA4 (derive) | view_item / sessions | higher |
 | atc_rate | Add-to-cart rate | GA4 | add_to_cart / view_item | higher |
 | atc_vol | Add-to-cart volume | GA4 | add_to_cart events | higher |
-| email_cap | Email capture rate | KLV/GA4 (derive) | new_subs / sessions | higher |
-| sms_cap | SMS opt-in rate | KLV (derive) | sms_subs / sessions | higher |
+| email_cap | Email capture rate | DBX (Klaviyo)/GA4 (derive) | new_subs / sessions | higher |
+| sms_cap | SMS opt-in rate | DBX (Klaviyo) (derive) | sms_subs / sessions | higher |
 | quiz | Quiz completion | GA4/app | quiz_complete | higher |
-| lead_mag | Lead-magnet uptake | KLV/GA4 | lead_form_submits | higher |
-| list_growth | List growth rate | KLV | net_new_subscribers | higher |
-| list_size | List size | KLV | active_profiles | higher |
-| deliver | Deliverability | KLV | inbox_placement / bounce | higher |
-| open_rate | Email open rate | KLV | open_rate | higher |
-| click_rate | Email click rate | KLV | click_rate | higher |
-| flow_ctr | Flow click rate | KLV | flow_click_rate | higher |
+| lead_mag | Lead-magnet uptake | DBX (Klaviyo)/GA4 | lead_form_submits | higher |
+| list_growth | List growth rate | DBX (Klaviyo) | net_new_subscribers | higher |
+| list_size | List size | DBX (Klaviyo) | active_profiles `(snapshot-only)` | higher |
+| deliver | Deliverability | DBX (Klaviyo) | inbox_placement / bounce | higher |
+| open_rate | Email open rate | DBX (Klaviyo) | open_rate | higher |
+| click_rate | Email click rate | DBX (Klaviyo) | click_rate | higher |
+| flow_ctr | Flow click rate | DBX (Klaviyo) | flow_click_rate | higher |
 | rvr | Returning-visitor rate | GA4 | returning / total sessions | higher |
-| rtg_pool | Retargeting pool | META | warm_audience_size | higher |
-| bis | Back-in-stock / wishlist | app/KLV | bis_signups | higher |
+| rtg_pool | Retargeting pool | META | warm_audience_size `(snapshot-only)` | higher |
+| bis | Back-in-stock / wishlist | app/DBX (Klaviyo) | bis_signups | higher |
 
 ## BOF — conversion
 | id | label | source | metric | good dir |
@@ -104,12 +106,12 @@ Sources: DBX = Databox, TW = Triple Whale (moby), GA4, KLV = Klaviyo, META = Met
 ## AOV — offer mechanics
 | id | source | metric | good dir |
 |---|---|---|---|
-| upo | TW/Shopify | units_per_order | higher |
-| asp | TW/Shopify | avg_selling_price | context |
+| upo | DBX (Shopify) | units_per_order | higher |
+| asp | DBX (Shopify) | avg_selling_price | context |
 | attach | Shopify | cross_sell_attach_rate | higher |
 | upsell | upsell app | upsell_take_rate | higher |
 | bundle | Shopify | bundle_order_share | higher |
-| sub_attach | sub app | subscription_attach_rate | higher |
+| sub_attach | DBX (if the subscription app reports into Shopify/Databox) | subscription_attach_rate — DATA_NOT_AVAILABLE if sub app not in Databox | higher |
 | ship_gap | Shopify (derive) | gap_to_free_ship | lower |
 | bnpl | Shopify | bnpl_share | higher |
 | discount | Shopify | discount_rate | context |
@@ -118,20 +120,22 @@ Sources: DBX = Databox, TW = Triple Whale (moby), GA4, KLV = Klaviyo, META = Met
 ## Retention — LTV loop
 | id | source | metric | good dir |
 |---|---|---|---|
-| repeat_rate | TW | repeat_purchase_rate | higher |
-| freq | TW | purchase_frequency | higher |
-| ibt | TW | days_between_orders | lower |
-| ltv | TW | ltv_60/90d | higher |
-| rep_30_90 | TW | 30/60/90d repeat | higher |
-| sub_active | sub app | active_subscriptions | higher |
-| sub_churn | sub app | subscription_churn | lower |
-| winback | KLV | winback_revenue/rate | higher |
-| pp_flow_rev | KLV | post_purchase_flow_revenue | higher |
+| repeat_rate | DBX (Shopify) | returning-customer orders ÷ total orders (resolve exact keys via Databox `list_metrics`) | higher |
+| freq | DBX (Shopify) | orders ÷ unique customers over the window | higher |
+| ibt | none (customer-level data) | DATA_NOT_AVAILABLE in the current stack — needs customer-order-level data; flag if a lever would need it | lower |
+| ltv | DBX (Shopify) PROXY | trailing-365d revenue ÷ trailing-365d unique customers — label source `shopify:ltv_proxy_365d` and treat as PROXY (not cohort LTV; benchmark with caution) | higher |
+| rep_30_90 | none (customer-level data) | DATA_NOT_AVAILABLE in the current stack — needs cohort data; flag if a lever would need it | higher |
+
+**Shopify retention metrics:** do NOT mark the whole retention layer unmeasured. `ret_rev`, `repeat_rate`, `freq`, and the `ltv` proxy are all computable from Shopify-via-Databox aggregates (new-vs-returning sales/orders splits + customer counts; resolve exact metric keys per account via `list_metrics`). Record them per the Step 1 recording mandate, with the formula in `source`. Only `ibt` and `rep_30_90` genuinely require customer-level data — mark those DATA_NOT_AVAILABLE.
+| sub_active | DBX (if the subscription app reports into Shopify/Databox) | active_subscriptions — DATA_NOT_AVAILABLE if sub app not in Databox `(snapshot-only)` | higher |
+| sub_churn | DBX (if the subscription app reports into Shopify/Databox) | subscription_churn — DATA_NOT_AVAILABLE if sub app not in Databox | lower |
+| winback | DBX (Klaviyo) | winback_revenue/rate | higher |
+| pp_flow_rev | DBX (Klaviyo) | post_purchase_flow_revenue | higher |
 | loyalty | loyalty app | active_members | higher |
 | referral_rate | referral app | referral_rate | higher |
 | review_rate | reviews app | review_submission_rate | higher |
 | return_rate | Shopify | return_rate | lower |
-| replenish | TW (derive) | replenishment_rate | higher |
+| replenish | none (customer-level data) | DATA_NOT_AVAILABLE in the current stack — needs customer-order-level data; flag if a lever would need it | higher |
 | nps | survey (qual) | nps | higher |
 
 **Direction note:** `good dir = lower` nodes are the negative drivers in the graph (cart_aband, co_aband, bounce, frequency, cpm, cpc, ibt, sub_churn, return_rate, ship_gap). For these, "headroom to improve" = how far CURRENT is ABOVE the benchmark (room to bring it down). `score.py` handles this via the `higher_is_better` flag.

@@ -1,0 +1,491 @@
+<style>
+#fg-open{position:fixed;right:18px;bottom:18px;z-index:99998;background:#ffffff;color:#1f2430;
+  border:1px solid #d8dee8;border-radius:999px;padding:10px 18px;font:600 13px ui-sans-serif,system-ui;
+  cursor:pointer;box-shadow:0 6px 20px rgba(0,0,0,.12)}
+#fg-open:hover{border-color:#0284c7}
+#fg-overlay{position:fixed;inset:0;z-index:99999;background:#f6f7f9;color:#1f2430;
+  font:14px/1.5 ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+  --bg:#f6f7f9;--panel:#ffffff;--panel2:#eef1f5;--ink:#1f2430;--muted:#6b7280;--line:#d8dee8;
+  --tof:#c4b5fd;--mof:#7dd3fc;--bof:#86efac;--aov:#fde047;--ret:#fdba74;--spine:#94a3b8;--out:#f9a8d4;
+  --pos:#0284c7;--neg:#e11d48;--ident:#64748b;
+  margin:0;overflow:hidden}
+#fg-overlay[hidden]{display:none}
+#fg-close{position:absolute;right:14px;top:10px;z-index:7;background:#fff;color:#1f2430;
+  border:1px solid var(--line);border-radius:7px;padding:6px 12px;font-size:12px;cursor:pointer}
+#fg-close:hover{border-color:#0284c7}
+#fg-overlay *{box-sizing:border-box}
+#fg-wrap{display:flex;height:100vh;width:100vw}
+#fg-side{width:270px;flex:0 0 270px;background:var(--panel);border-right:1px solid var(--line);padding:16px;overflow-y:auto}
+#fg-side h1{font-size:15px;margin:0 0 2px}
+#fg-side .sub{color:var(--muted);font-size:11.5px;margin:0 0 14px}
+#fg-overlay .grp{margin:0 0 15px}
+#fg-overlay .grp h2{font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:0 0 7px}
+#fg-overlay .row{display:flex;align-items:center;gap:8px;margin:4px 0;font-size:12.5px;cursor:pointer;user-select:none}
+#fg-overlay .row input{accent-color:#0284c7}
+#fg-overlay .row select{background:var(--panel2);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:3px 6px;font-size:12px}
+#fg-overlay .sw{width:11px;height:11px;border-radius:3px;flex:0 0 11px}
+#fg-overlay .legrow{display:flex;align-items:center;gap:8px;margin:5px 0;font-size:11.5px;color:var(--muted)}
+#fg-overlay .ln{width:24px;height:0;flex:0 0 24px}
+#fg-overlay input[type=range]{width:100%;accent-color:#0284c7}
+#fg-overlay .val{color:var(--ink);font-weight:600}
+#fg-stage{flex:1;position:relative;overflow:hidden}
+#fg-overlay svg{width:100%;height:100%;display:block;cursor:grab;touch-action:none}
+#fg-overlay svg.panning{cursor:grabbing}
+#fg-overlay .edge{stroke-linecap:round}
+#fg-overlay .node circle{cursor:pointer;stroke:#475569;stroke-width:1}
+#fg-overlay .node .ring,#fg-overlay .node .badge{pointer-events:none}
+#fg-overlay .node text{fill:#1f2430;font-size:10px;pointer-events:none;paint-order:stroke;stroke:#ffffff;stroke-width:3px;stroke-linejoin:round;opacity:0;transition:opacity .12s}
+#fg-overlay svg.zoomed .node text{opacity:1}
+#fg-overlay .node.hub text{opacity:1}
+#fg-overlay .node.hl text{opacity:1}
+#fg-overlay .node.measured text{opacity:1}
+#fg-overlay .dim{opacity:.06}
+#fg-overlay .dimt{opacity:.1}
+#fg-tip{position:absolute;pointer-events:none;background:#fff;border:1px solid var(--line);border-radius:8px;padding:9px 11px;max-width:230px;font-size:12px;color:#1f2430;opacity:0;transition:opacity .1s;box-shadow:0 8px 24px rgba(0,0,0,.15);z-index:5}
+#fg-tip b{color:#111}
+#fg-tip .lag{color:var(--muted);margin-top:4px;display:block}
+#fg-overlay .note{color:var(--muted);font-size:10.6px;line-height:1.45;border-top:1px solid var(--line);padding-top:10px;margin-top:4px}
+#fg-overlay button,#fg-overlay label.btn{display:block;width:100%;text-align:center;background:var(--panel2);color:var(--ink);border:1px solid var(--line);border-radius:7px;padding:7px;font-size:12px;cursor:pointer;margin-top:6px}
+#fg-overlay button:hover,#fg-overlay label.btn:hover{border-color:#0284c7}
+#fg-zhint{position:absolute;left:12px;bottom:12px;color:var(--muted);font-size:11px;background:rgba(255,255,255,.8);border:1px solid var(--line);border-radius:7px;padding:6px 10px}
+#fg-diagBtn.on{background:#0284c7;color:#ffffff;border-color:#0284c7;font-weight:700}
+#fg-diag{position:absolute;right:12px;top:12px;width:244px;max-height:calc(100% - 24px);overflow-y:auto;background:#fff;border:1px solid var(--line);border-radius:10px;padding:14px;color:#1f2430;display:none;z-index:6;box-shadow:0 10px 30px rgba(0,0,0,.15)}
+#fg-diag .dx{position:absolute;right:10px;top:7px;cursor:pointer;color:var(--muted);font-size:17px;line-height:1}
+#fg-diag .dx:hover{color:var(--ink)}
+#fg-diag .dh{font-size:14px;font-weight:700;padding-right:16px}
+#fg-diag .dh span{margin-left:6px;font-size:10px;color:var(--muted);font-weight:600}
+#fg-diag .dd{color:var(--muted);font-size:11.5px;margin:4px 0 6px}
+#fg-diag .dl{font-size:9.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin:11px 0 4px}
+#fg-diag ol{margin:0;padding:0;list-style:none}
+#fg-diag li{display:flex;justify-content:space-between;gap:8px;font-size:12px;padding:3px 0;border-bottom:1px solid rgba(0,0,0,.06)}
+#fg-diag li span{flex:1}
+#fg-diag li em{font-style:normal;color:var(--muted);font-variant-numeric:tabular-nums}
+#fg-diag li em.n{color:var(--neg)}
+#fg-diag li em.p{color:var(--pos)}
+#fg-diag .warn{background:rgba(225,29,72,.08);border:1px solid #e11d48;color:#9f1239;border-radius:6px;padding:6px 8px;font-size:11px;margin:8px 0}
+#fg-overlay .chrow{display:flex;align-items:center;gap:6px;font-size:11.5px;padding:2.5px 0;cursor:default}
+#fg-overlay .chrow em{font-style:normal;margin-left:auto;font-variant-numeric:tabular-nums;font-weight:600}
+#fg-overlay .chrow .cdot{width:7px;height:7px;border-radius:50%;flex:0 0 7px}
+#fg-overlay .chsum{font-size:11px;color:var(--muted);margin:2px 0 6px}
+</style>
+<button id="fg-open" type="button">Funnel graph</button>
+<div id="fg-overlay" hidden>
+<button id="fg-close" type="button">Close ✕</button>
+<div id="fg-wrap">
+<div id="fg-side">
+<h1>Funnel graph — <span id="fg-client"></span></h1>
+<p class="sub" id="fg-sub"></p>
+<div class="grp"><h2>Compare periods</h2>
+  <label class="row" style="justify-content:space-between">Baseline
+    <select id="fg-base" style="max-width:140px"></select></label>
+  <label class="row" style="justify-content:space-between">Compare
+    <select id="fg-cmp" style="max-width:140px"></select></label>
+  <p class="note" id="fg-pullnote" style="border:none;padding:0;margin:4px 0 0"></p>
+  <label class="row"><input type="checkbox" id="fg-bychange"><span class="sw" style="background:linear-gradient(90deg,#4ade80 50%,#f87171 50%)"></span>color nodes by change</label>
+</div>
+<div class="grp"><h2>Changes (baseline → compare)</h2><div id="fg-changes"></div></div>
+<div class="grp"><h2>Node legend</h2>
+  <div class="legrow"><span class="sw" style="background:#7dd3fc"></span>tracked (fill = closeness to benchmark)</div>
+  <div class="legrow"><span class="sw" style="background:#e9edf2;border:1.5px dashed #94a3b8"></span>not tracked / no data</div>
+  <div class="legrow"><span class="sw" style="background:none;border:1.5px dotted #b6c0cd"></span>not pullable — hidden; click a connected node to reveal</div>
+  <div class="legrow"><span class="ln" style="border-top:2px solid #d8dee8"></span>edges shown only between measured nodes</div>
+  <div class="legrow"><span class="sw" style="background:none;border:2px solid #16a34a;border-radius:50%"></span>improved vs baseline</div>
+  <div class="legrow"><span class="sw" style="background:none;border:2px solid #dc2626;border-radius:50%"></span>declined vs baseline</div>
+  <div class="legrow"><span class="sw" style="background:#2563eb;width:6px;height:6px;border-radius:50%"></span>newly measured</div>
+  <div class="legrow"><span class="sw" style="background:linear-gradient(90deg,#4ade80 33%,#e2e8f0 33%,#e2e8f0 66%,#f87171 66%)"></span>"color by change": green improved · gray flat · red declined · blue new</div>
+</div>
+<div class="grp"><h2>Min strength shown <span class="val" id="fg-thv">0.30</span></h2><input type="range" id="fg-thr" min="0" max="0.9" step="0.05" value="0.3"></div>
+<div class="grp"><h2>Layers</h2>
+<label class="row"><input type="checkbox" data-layer="tof" checked><span class="sw" style="background:var(--tof)"></span>TOF - demand creation</label>
+<label class="row"><input type="checkbox" data-layer="mof" checked><span class="sw" style="background:var(--mof)"></span>MOF - demand capture</label>
+<label class="row"><input type="checkbox" data-layer="bof" checked><span class="sw" style="background:var(--bof)"></span>BOF - conversion</label>
+<label class="row"><input type="checkbox" data-layer="aov" checked><span class="sw" style="background:var(--aov)"></span>AOV - offer mechanics</label>
+<label class="row"><input type="checkbox" data-layer="ret" checked><span class="sw" style="background:var(--ret)"></span>Retention / LTV loop</label>
+<label class="row"><input type="checkbox" data-layer="spine" checked><span class="sw" style="background:var(--spine)"></span>Identity spine</label>
+<label class="row"><input type="checkbox" data-layer="out" checked><span class="sw" style="background:var(--out)"></span>Revenue</label>
+<label class="row"><input type="checkbox" id="fg-showctx"><span class="sw" style="background:none;border:1px dashed #94a3b8"></span>show unmeasured connections</label>
+<label class="row"><input type="checkbox" id="fg-shownp"><span class="sw" style="background:none;border:1px dotted #b6c0cd"></span>show non-pullable nodes</label></div>
+<div class="grp"><h2>Edge legend</h2>
+<div class="legrow"><span class="ln" style="border-top:6px solid var(--pos)"></span>thick = strong</div>
+<div class="legrow"><span class="ln" style="border-top:2px solid var(--pos)"></span>thin = weak</div>
+<div class="legrow"><span class="ln" style="border-top:3px solid var(--pos)"></span>positive - <span class="ln" style="border-top:3px solid var(--neg);margin-left:3px"></span>negative</div>
+<div class="legrow"><span class="ln" style="border-top:3px dashed var(--muted)"></span>lagged signal (3wk+)</div>
+<div class="legrow"><span class="ln" style="border-top:3px solid var(--ident)"></span>identity (math)</div></div>
+<div class="grp"><button id="fg-diagBtn" type="button">Diagnose mode: OFF</button></div>
+<div class="grp"><button id="fg-fit" type="button">Recenter / fit</button><button id="fg-reheat" type="button">Re-run layout</button>
+<label class="btn">Load edges CSV...<input type="file" id="fg-csv" accept=".csv" hidden></label></div>
+<p class="note"><b>Edge strengths are hypothesized priors.</b> Node values are live pulls. Load a measured edges CSV to replace priors.</p>
+</div>
+<div id="fg-stage"><svg id="fg-svg"></svg><div id="fg-tip"></div><div id="fg-diag"></div><div id="fg-zhint">drag = pan · scroll = zoom · Diagnose mode → click a node to trace its causes</div></div>
+</div>
+</div>
+<script>
+(function(){
+const DATA = /*__GRAPH_DATA__*/null;
+if(!DATA){console.warn("funnel graph: no data injected");return;}
+
+const _ov=document.getElementById('fg-overlay');
+if(_ov.dataset.fgInit){return;}
+_ov.dataset.fgInit='1';
+
+function esc(s){return s==null?'':String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+/*DELTA_ENGINE_START*/
+function computeDeltas(values, compareDate, baselineDate, floors){
+  const cmp = values[compareDate] || {};
+  const base = (baselineDate && baselineDate !== compareDate) ? (values[baselineDate] || null) : null;
+  const out = {};
+  for (const id in cmp){
+    const c = cmp[id];
+    const FLAT = (floors && floors[id]) || 0.02;
+    let state = 'unmeasured', rel = null, health = null, prev = null;
+    if (c.m){
+      if (c.b != null && c.b !== 0 && c.c != null){
+        health = c.hib ? Math.min(c.c / c.b, 1) : Math.min(c.b / Math.max(c.c, 1e-9), 1);
+        health = Math.max(health, 0);
+      }
+      state = 'flat';
+      if (base){
+        const p = base[id];
+        if (!p || !p.m) state = 'new';
+        else {
+          prev = p.c;
+          if (p.c != null && Math.abs(p.c) > 1e-12 && c.c != null){
+            rel = (c.c - p.c) / Math.abs(p.c) * (c.hib ? 1 : -1);
+            state = rel > FLAT ? 'improved' : (rel < -FLAT ? 'declined' : 'flat');
+          }
+        }
+      }
+    } else if (base && base[id] && base[id].m){
+      state = 'lost'; prev = base[id].c;
+    }
+    out[id] = {state, rel, cur: c.m ? c.c : null, prev, health};
+  }
+  if (base){
+    for (const id in base){
+      if (!(id in cmp) && base[id].m) out[id] = {state:'lost', rel:null, cur:null, prev:base[id].c, health:null};
+    }
+  }
+  return out;
+}
+/*DELTA_ENGINE_END*/
+
+// ===== overlay open/close =====
+const overlay=document.getElementById('fg-overlay'),openBtn=document.getElementById('fg-open');
+openBtn.addEventListener('click',()=>{overlay.hidden=false;fitView();});
+document.getElementById('fg-close').addEventListener('click',()=>overlay.hidden=true);
+document.addEventListener('keydown',e=>{if(e.key==='Escape')overlay.hidden=true;});
+
+// ===== data =====
+const COL={tof:'#c4b5fd',mof:'#7dd3fc',bof:'#86efac',aov:'#fde047',ret:'#fdba74',spine:'#94a3b8',out:'#f9a8d4'};
+const nodes=DATA.nodes.map(n=>({...n}));
+const N=new Map(nodes.map(n=>[n.id,n]));
+const nodeIds=new Set(DATA.nodes.map(n=>n.id));
+let links=DATA.edges.filter(e=>nodeIds.has(e.s)&&nodeIds.has(e.t)).map(e=>({...e}));
+let adj,deg;
+function rebuildAdj(){
+  adj=new Map(nodes.map(n=>[n.id,new Set()]));
+  deg=new Map(nodes.map(n=>[n.id,0]));
+  links.forEach(l=>{adj.get(l.s).add(l.t);adj.get(l.t).add(l.s);deg.set(l.s,deg.get(l.s)+1);deg.set(l.t,deg.get(l.t)+1);});
+}
+rebuildAdj();
+
+const svg=document.getElementById('fg-svg'),tip=document.getElementById('fg-tip');
+const NS='http://www.w3.org/2000/svg';
+let RW=1700,RH=1150;
+const layerY={tof:.10,mof:.28,bof:.46,aov:.58,spine:.72,ret:.92,out:.82};
+nodes.forEach(n=>{const p=DATA.layout[n.id]||[RW/2,RH/2];n.x=p[0];n.y=p[1];n.vx=0;n.vy=0;n.fixed=false;
+  n.r=6+Math.min(deg.get(n.id),10)*1.2;if(n.layer==='out')n.r=16;});
+
+const defs=document.createElementNS(NS,'defs');
+[['fg-aP','#0284c7'],['fg-aN','#e11d48'],['fg-aI','#64748b']].forEach(([id,c])=>{const m=document.createElementNS(NS,'marker');m.setAttribute('id',id);m.setAttribute('markerWidth','8');m.setAttribute('markerHeight','8');m.setAttribute('refX','7');m.setAttribute('refY','3');m.setAttribute('orient','auto');m.setAttribute('markerUnits','userSpaceOnUse');const p=document.createElementNS(NS,'path');p.setAttribute('d','M0,0 L7,3 L0,6 Z');p.setAttribute('fill',c);m.appendChild(p);defs.appendChild(m);});
+svg.appendChild(defs);
+const gv=document.createElementNS(NS,'g');svg.appendChild(gv);
+const gE=document.createElementNS(NS,'g');gv.appendChild(gE);
+const gN=document.createElementNS(NS,'g');gv.appendChild(gN);
+
+let edgeEls=[],nodeEls=new Map();
+function renderGraph(){
+  gE.innerHTML='';gN.innerHTML='';edgeEls=[];nodeEls=new Map();
+  edgeEls=links.map(l=>{const ln=document.createElementNS(NS,'line');ln.setAttribute('class','edge');
+    const col=l.type==='identity'?'var(--ident)':(l.sign<0?'var(--neg)':'var(--pos)');
+    ln.setAttribute('stroke',col);ln.setAttribute('stroke-width',(0.5+l.w*4).toFixed(2));
+    ln.setAttribute('opacity',l.type==='identity'?.85:.5);
+    if(l.lag>=3)ln.setAttribute('stroke-dasharray','6 5');
+    ln.setAttribute('marker-end',`url(#${l.type==='identity'?'fg-aI':(l.sign<0?'fg-aN':'fg-aP')})`);
+    ln._l=l;gE.appendChild(ln);return ln;});
+  nodes.forEach(n=>{const g=document.createElementNS(NS,'g');g.setAttribute('class','node'+(deg.get(n.id)>=7?' hub':''));
+    const ring=document.createElementNS(NS,'circle');ring.setAttribute('class','ring');ring.setAttribute('fill','none');ring.setAttribute('opacity','0');
+    const c=document.createElementNS(NS,'circle');c.setAttribute('class','core');c.setAttribute('r',n.r);c.setAttribute('fill',COL[n.layer]);
+    const badge=document.createElementNS(NS,'circle');badge.setAttribute('class','badge');badge.setAttribute('r','3');badge.setAttribute('cx',n.r*0.8);badge.setAttribute('cy',-n.r*0.8);badge.setAttribute('fill','#2563eb');badge.setAttribute('stroke','#ffffff');badge.setAttribute('stroke-width','0.8');badge.setAttribute('opacity','0');
+    const tx2=document.createElementNS(NS,'text');tx2.setAttribute('x',n.r+4);tx2.setAttribute('y',4);tx2.textContent=n.label;
+    g.appendChild(ring);g.appendChild(c);g.appendChild(badge);g.appendChild(tx2);
+    g.addEventListener('mouseenter',()=>hover(n.id));g.addEventListener('mouseleave',clearHover);
+    g.addEventListener('mousemove',ev=>moveTip(ev,n));
+    g.addEventListener('mousedown',ev=>{ev.stopPropagation();startDrag(ev,n);});
+    g.addEventListener('click',ev=>{ev.stopPropagation();if(dragMoved)return;if(diagnoseMode)diagnose(n.id);else toggleReveal(n.id);});
+    gN.appendChild(g);nodeEls.set(n.id,{g});});
+}
+
+// ===== period pickers =====
+const baseSel=document.getElementById('fg-base'),cmpSel=document.getElementById('fg-cmp');
+document.getElementById('fg-client').textContent=DATA.client;
+const periods=DATA.periods;                       // [{id,start,end,grain,days}] sorted by (end,start)
+const P=new Map(periods.map(p=>[p.id,p]));
+function eligibleBase(b,c){return !!(b&&c&&b.grain===c.grain&&b.end<c.start&&
+  (b.grain!=='adhoc'||Math.abs(b.days-c.days)/Math.max(b.days,c.days)<=0.1));}
+function fillSel(sel,withNone){
+  const wk=periods.filter(p=>p.grain==='week'),ah=periods.filter(p=>p.grain==='adhoc');
+  const opt=p=>`<option value="${p.id}">${p.start} .. ${p.end}${p.grain==='adhoc'?` (${p.days}d)`:''}</option>`;
+  sel.innerHTML=(withNone?'<option value="">— none eligible —</option>':'')+
+                (wk.length?`<optgroup label="Weeks">${wk.map(opt).join('')}</optgroup>`:'')+
+                (ah.length?`<optgroup label="⚠ Ad-hoc">${ah.map(opt).join('')}</optgroup>`:'');
+}
+fillSel(cmpSel,false);fillSel(baseSel,true);
+let cmpDate=DATA.runPeriod&&P.has(DATA.runPeriod)?DATA.runPeriod:(periods[periods.length-1]||{}).id;
+function latestEligibleBase(){const c=P.get(cmpDate);
+  const cands=periods.filter(p=>eligibleBase(p,c));
+  return cands.length?cands[cands.length-1].id:null;}
+let baseDate=latestEligibleBase();
+function syncPickerOptions(){
+  const c=P.get(cmpDate),b=baseDate?P.get(baseDate):null;
+  // baseline options: eligible under the CURRENT compare. "— none eligible —" sentinel only selectable when null.
+  [...baseSel.options].forEach(o=>{
+    if(o.value==='')o.disabled=baseDate!==null;
+    else o.disabled=!eligibleBase(P.get(o.value),c);});
+  // compare options: enabled iff the current baseline fits under it, or (no baseline) it has SOME eligible
+  // baseline; the currently selected compare always stays enabled (covers single-period and no-baseline modes).
+  [...cmpSel.options].forEach(o=>{const cc=P.get(o.value);
+    o.disabled=o.value!==cmpDate&&!(b?eligibleBase(b,cc):periods.some(p=>eligibleBase(p,cc)));});
+  cmpSel.value=cmpDate;baseSel.value=baseDate||'';
+}
+function syncPullNote(){
+  document.getElementById('fg-pullnote').textContent=
+    baseDate===null?'No comparable prior period yet.':'Rings show change from baseline → compare.';
+}
+syncPickerOptions();syncPullNote();
+document.getElementById('fg-sub').textContent=`${DATA.nodes.length} levers · run ${DATA.runPeriod}`;
+baseSel.addEventListener('change',()=>{baseDate=baseSel.value||null;syncPickerOptions();syncPullNote();restyle();});
+cmpSel.addEventListener('change',()=>{cmpDate=cmpSel.value;
+  if(!eligibleBase(P.get(baseDate),P.get(cmpDate)))baseDate=latestEligibleBase();  // re-validate baseline
+  syncPickerOptions();syncPullNote();restyle();});
+
+// ===== self-calibrating noise floors (per node, from adjacent weekly history) =====
+function nextDay(iso){const d=new Date(iso+'T00:00:00Z');d.setUTCDate(d.getUTCDate()+1);return d.toISOString().slice(0,10);}
+const FLOORS=(()=>{
+  const wk=periods.filter(p=>p.grain==='week');
+  const out={};
+  DATA.nodes.forEach(n=>{const mv=[];
+    for(let i=1;i<wk.length;i++){
+      if(nextDay(wk[i-1].end)!==wk[i].start)continue;          // adjacent calendar weeks only
+      const a=(DATA.values[wk[i-1].id]||{})[n.id],b=(DATA.values[wk[i].id]||{})[n.id];
+      if(a&&b&&a.m&&b.m&&a.c!=null&&b.c!=null&&Math.abs(a.c)>1e-12)
+        mv.push(Math.abs((b.c-a.c)/Math.abs(a.c)));}
+    if(mv.length>=3){mv.sort((x,y)=>x-y);out[n.id]=Math.max(0.02,1.5*mv[Math.floor(mv.length/2)]);}});
+  return out;})();
+
+// ===== live restyle (delta states) =====
+let deltas={};
+let measuredSet=new Set();
+let revealAnchor=null,revealed=new Set();
+function isDormant(id){const v=(DATA.values[cmpDate]||{})[id];return !!(v&&v.np===1&&!measuredSet.has(id));}
+function restyle(){
+  deltas=computeDeltas(DATA.values,cmpDate,baseDate,FLOORS);
+  measuredSet=new Set(nodes.filter(n=>{const d=deltas[n.id];return d&&d.state!=='unmeasured'&&d.state!=='lost';}).map(n=>n.id));
+  revealAnchor=null;revealed=new Set();
+  nodes.forEach(n=>{const el=nodeEls.get(n.id);if(!el)return;
+    const d=deltas[n.id]||{state:'unmeasured',health:null,rel:null};
+    const core=el.g.querySelector('.core'),ring=el.g.querySelector('.ring'),badge=el.g.querySelector('.badge');
+    const measured=d.state!=='unmeasured'&&d.state!=='lost';
+    el.g.classList.toggle('measured',measured);
+    if(measured){
+      if(bcCb.checked){
+        const SC={improved:['#4ade80','#16a34a'],declined:['#f87171','#dc2626'],new:['#93c5fd','#2563eb'],flat:['#e2e8f0','#94a3b8']};
+        const sc=SC[d.state]||SC.flat;
+        core.setAttribute('fill',sc[0]);core.setAttribute('fill-opacity','1');
+        core.setAttribute('stroke',sc[1]);core.setAttribute('stroke-dasharray','');core.setAttribute('stroke-width','1.5');
+      }else{
+        core.setAttribute('fill',COL[n.layer]);
+        core.setAttribute('fill-opacity',d.health==null?0.85:(0.35+0.65*d.health).toFixed(2));
+        core.setAttribute('stroke','#475569');core.setAttribute('stroke-dasharray','');core.setAttribute('stroke-width','1');
+      }}
+    else{const dorm=isDormant(n.id);core.setAttribute('fill','#e9edf2');core.setAttribute('fill-opacity','1');
+      core.setAttribute('stroke',dorm?'#b6c0cd':'#94a3b8');core.setAttribute('stroke-dasharray',dorm?'1.5 3':'3 3');
+      core.setAttribute('stroke-width','1.4');}
+    if(d.state==='improved'||d.state==='declined'){
+      ring.setAttribute('r',n.r+4);
+      ring.setAttribute('stroke',d.state==='improved'?'#16a34a':'#dc2626');
+      ring.setAttribute('stroke-width',(2.5+Math.min(Math.abs(d.rel??0),0.5)*9).toFixed(1));
+      ring.setAttribute('opacity','1');}
+    else ring.setAttribute('opacity','0');
+    badge.setAttribute('opacity',d.state==='new'?'1':'0');
+  });
+  applyFilter();
+  renderChanges();
+}
+
+function renderChanges(){
+  const box=document.getElementById('fg-changes');
+  const movers=[],news=[],losts=[];
+  nodes.forEach(n=>{const d=deltas[n.id];if(!d)return;
+    if(d.state==='improved'||d.state==='declined')movers.push({n,d});
+    else if(d.state==='new')news.push(n);
+    else if(d.state==='lost')losts.push(n);});
+  movers.sort((a,b)=>Math.abs(b.d.rel??0)-Math.abs(a.d.rel??0));
+  const up=movers.filter(m=>m.d.state==='improved').length,dn=movers.length-up;
+  let html='';
+  const cP=P.get(cmpDate),bP=baseDate?P.get(baseDate):null;
+  if((cP&&cP.grain==='adhoc')||(bP&&bP.grain==='adhoc'))
+    html+=`<div class="chsum">⚠ ad-hoc windows: ${bP?bP.days:'—'}d vs ${cP?cP.days:'—'}d — volumes not length-adjusted</div>`;
+  html+=`<div class="chsum">▲ ${up} improved · ▼ ${dn} declined · ● ${news.length} newly tracked${losts.length?` · ${losts.length} lost`:''}</div>`;
+  if(!movers.length&&!news.length&&!losts.length)html+=`<div class="chsum">No movement above the noise floor for these nodes.</div>`;
+  movers.slice(0,10).forEach(({n,d})=>{const good=d.state==='improved';
+    html+=`<div class="chrow" data-node="${n.id}"><span class="cdot" style="background:${good?'#16a34a':'#dc2626'}"></span>${esc(n.label)}<em style="color:${good?'#16a34a':'#dc2626'}">${d.rel>0?'+':''}${(d.rel*100).toFixed(1)}%</em></div>`;});
+  if(news.length)html+=`<div class="chrow" style="color:var(--muted)"><span class="cdot" style="background:#2563eb"></span>${news.length} newly tracked: ${esc(news.slice(0,4).map(n=>n.label).join(', '))}${news.length>4?'…':''}</div>`;
+  losts.forEach(n=>{html+=`<div class="chrow" style="color:var(--muted)"><span class="cdot" style="background:#94a3b8"></span>${esc(n.label)}<em>lost</em></div>`;});
+  box.innerHTML=html;
+  box.querySelectorAll('.chrow[data-node]').forEach(r=>{r.addEventListener('mouseenter',()=>hover(r.dataset.node));r.addEventListener('mouseleave',clearHover);});
+}
+
+// view transform (pan/zoom)
+let tx=0,ty=0,k=1;
+function setT(){gv.setAttribute('transform',`translate(${tx},${ty}) scale(${k})`);svg.classList.toggle('zoomed',k>=0.85);}
+function s2w(sx,sy){const r=svg.getBoundingClientRect();return{x:(sx-r.left-tx)/k,y:(sy-r.top-ty)/k};}
+svg.addEventListener('wheel',ev=>{if(overlay.hidden)return;ev.preventDefault();const r=svg.getBoundingClientRect();const w=s2w(ev.clientX,ev.clientY);
+  const f=ev.deltaY<0?1.12:1/1.12;k=Math.max(0.15,Math.min(4,k*f));
+  tx=ev.clientX-r.left-w.x*k;ty=ev.clientY-r.top-w.y*k;setT();},{passive:false});
+let panning=false,panL=null;
+svg.addEventListener('mousedown',ev=>{if(overlay.hidden)return;panning=true;panL=[ev.clientX,ev.clientY];svg.classList.add('panning');if(selActive)clearDiag();if(revealAnchor){revealAnchor=null;revealed=new Set();applyFilter();}});
+window.addEventListener('mousemove',ev=>{
+  if(overlay.hidden)return;
+  if(drag){dragMoved=true;const w=s2w(ev.clientX,ev.clientY);drag.x=w.x;drag.y=w.y;draw();return;}
+  if(panning){tx+=ev.clientX-panL[0];ty+=ev.clientY-panL[1];panL=[ev.clientX,ev.clientY];setT();}});
+window.addEventListener('mouseup',()=>{panning=false;svg.classList.remove('panning');if(drag){drag.fixed=false;drag=null;}});
+
+// force sim (starts COLD — layout is precomputed; reheat is opt-in)
+let alpha=0;
+function tick(){
+  if(alpha<=0.02){draw();return;}
+  const REP=3400,SPR=0.012,CEN=0.012,LY=0.05;
+  for(let i=0;i<nodes.length;i++){const a=nodes[i];for(let j=i+1;j<nodes.length;j++){const b=nodes[j];
+    let dx=a.x-b.x,dy=a.y-b.y,d2=dx*dx+dy*dy||0.01,d=Math.sqrt(d2),f=REP/d2,fx=dx/d*f,fy=dy/d*f;
+    a.vx+=fx*alpha;a.vy+=fy*alpha;b.vx-=fx*alpha;b.vy-=fy*alpha;}}
+  links.forEach(l=>{const a=N.get(l.s),b=N.get(l.t);let dx=b.x-a.x,dy=b.y-a.y,d=Math.sqrt(dx*dx+dy*dy)||0.01;
+    const L=70+(1-l.w)*80,f=SPR*(d-L)*(0.4+l.w),fx=dx/d*f,fy=dy/d*f;
+    a.vx+=fx*alpha;a.vy+=fy*alpha;b.vx-=fx*alpha;b.vy-=fy*alpha;});
+  nodes.forEach(n=>{n.vx+=(RW*0.5-n.x)*CEN*alpha*0.4;n.vy+=(RH*layerY[n.layer]-n.y)*LY*alpha;
+    if(!n.fixed){n.vx*=0.82;n.vy*=0.82;n.x+=Math.max(-18,Math.min(18,n.vx));n.y+=Math.max(-18,Math.min(18,n.vy));}});
+  draw();alpha*=0.99;if(alpha<0.02)alpha=0.02;}
+function draw(){edgeEls.forEach(ln=>{const a=N.get(ln._l.s),b=N.get(ln._l.t);let dx=b.x-a.x,dy=b.y-a.y,d=Math.sqrt(dx*dx+dy*dy)||1,ux=dx/d,uy=dy/d;
+  ln.setAttribute('x1',a.x+ux*a.r);ln.setAttribute('y1',a.y+uy*a.r);ln.setAttribute('x2',b.x-ux*(b.r+6));ln.setAttribute('y2',b.y-uy*(b.r+6));});
+  nodes.forEach(n=>nodeEls.get(n.id).g.setAttribute('transform',`translate(${n.x},${n.y})`));}
+function loop(){if(!overlay.hidden)tick();requestAnimationFrame(loop);}
+
+function fitView(){const r=svg.getBoundingClientRect();let xs=nodes.filter(n=>n.layer&&visN(n)),mnx=1e9,mny=1e9,mxx=-1e9,mxy=-1e9;
+  xs.forEach(n=>{mnx=Math.min(mnx,n.x);mny=Math.min(mny,n.y);mxx=Math.max(mxx,n.x);mxy=Math.max(mxy,n.y);});
+  if(mnx>mxx)return;const bw=mxx-mnx+120,bh=mxy-mny+120;k=Math.max(0.2,Math.min(1.6,Math.min(r.width/bw,r.height/bh)));
+  const cx=(mnx+mxx)/2,cy=(mny+mxy)/2;tx=r.width/2-k*cx;ty=r.height/2-k*cy;setT();}
+
+// interactivity
+let thr=0.3;const active=new Set(Object.keys(COL));
+function visN(n){return active.has(n.layer);}
+const ctxCb=document.getElementById('fg-showctx');ctxCb.addEventListener('change',applyFilter);
+const npCb=document.getElementById('fg-shownp');npCb.addEventListener('change',applyFilter);
+const bcCb=document.getElementById('fg-bychange');bcCb.addEventListener('change',restyle);
+function applyFilter(){const showCtx=ctxCb.checked,showNp=npCb.checked;
+  nodes.forEach(n=>{const dorm=isDormant(n.id);
+    const vis=visN(n)&&(!dorm||showNp||revealed.has(n.id));
+    nodeEls.get(n.id).g.style.display=vis?'':'none';n._vis=vis;});
+  edgeEls.forEach(ln=>{const{s,t,w}=ln._l;const both=measuredSet.has(s)&&measuredSet.has(t);
+    const endpointsVisible=N.get(s)._vis&&N.get(t)._vis;
+    const revealEdge=revealAnchor&&((s===revealAnchor&&revealed.has(t))||(t===revealAnchor&&revealed.has(s)));
+    const vis=w>=thr&&endpointsVisible&&(both||showCtx||revealEdge);
+    ln.style.display=vis?'':'none';
+    ln.style.opacity=both?'':( (showCtx||revealEdge)?'0.12':'');});
+}
+function toggleReveal(id){
+  if(revealAnchor===id){revealAnchor=null;revealed=new Set();}
+  else{revealAnchor=id;revealed=new Set([...adj.get(id)].filter(isDormant));}
+  applyFilter();}
+document.getElementById('fg-thr').addEventListener('input',e=>{thr=+e.target.value;document.getElementById('fg-thv').textContent=thr.toFixed(2);applyFilter();});
+overlay.querySelectorAll('[data-layer]').forEach(cb=>cb.addEventListener('change',()=>{cb.checked?active.add(cb.dataset.layer):active.delete(cb.dataset.layer);applyFilter();}));
+document.getElementById('fg-fit').addEventListener('click',fitView);
+document.getElementById('fg-reheat').addEventListener('click',()=>alpha=1);
+
+function hover(id){if(selActive)return;const keep=new Set(adj.get(id));keep.add(id);
+  nodes.forEach(n=>{const g=nodeEls.get(n.id).g;g.classList.toggle('dimt',!keep.has(n.id));g.classList.toggle('hl',keep.has(n.id));});
+  edgeEls.forEach(ln=>ln.classList.toggle('dim',!(ln._l.s===id||ln._l.t===id)));}
+function clearHover(){if(selActive)return;nodes.forEach(n=>{const g=nodeEls.get(n.id).g;g.classList.remove('dimt');g.classList.remove('hl');});edgeEls.forEach(ln=>ln.classList.remove('dim'));tip.style.opacity=0;}
+
+// ===== tooltip with live values =====
+function fmt(x){if(x==null)return '—';const a=Math.abs(x);
+  return a>=1000?Math.round(x).toLocaleString():a>=1?x.toFixed(2):(a>=0.01?(x*100).toFixed(1)+'%':x.toPrecision(2));}
+function tipHTML(n){
+  const d=deltas[n.id]||{},v=(DATA.values[cmpDate]||{})[n.id]||{},b=(baseDate&&(DATA.values[baseDate]||{})[n.id])||{};
+  const relTxt=d.rel==null?'—':((d.rel>0?'+':'')+(d.rel*100).toFixed(1)+'% '+(d.state==='improved'?'▲ improved':d.state==='declined'?'▼ declined':'flat'));
+  const lines=[`<b>${esc(n.label)}</b>`,`<span class="lag">${esc(n.def)}</span>`,
+    `compare (${cmpDate}): <b>${fmt(d.cur)}</b>`,`baseline (${baseDate||'—'}): ${fmt(d.prev)}`,
+    `Δ (direction-adjusted): ${relTxt} <span class="lag">(noise floor ±${((FLOORS[n.id]||0.02)*100).toFixed(1)}%)</span>`,`benchmark: ${fmt(v.b)}`];
+  if(d.state==='unmeasured'){
+    if(v.np===1)lines.push(`<span class="lag">NOT PULLABLE — ${esc(v.src.replace(/^NOT_PULLABLE:\s*/i,''))}</span>`);
+    else lines.push(`<span class="lag">NOT TRACKED — no value recorded this pull</span>`);}
+  if(d.state==='lost')lines.push(`<span class="lag">⚠ measured in baseline but not in compare pull</span>`);
+  if(d.state==='new')lines.push(`<span class="lag">● newly measured this pull</span>`);
+  if(v.src)lines.push(`<span class="lag">${esc(v.src)} · ${esc(v.win||'')}</span>`);
+  return lines.join('<br>');
+}
+function moveTip(ev,n){const r=svg.getBoundingClientRect();tip.style.opacity=1;
+  tip.style.left=(ev.clientX-r.left+250>r.width?ev.clientX-r.left-210:ev.clientX-r.left+14)+'px';
+  tip.style.top=(ev.clientY-r.top+14)+'px';
+  tip.innerHTML=tipHTML(n);}
+
+let drag=null;
+function startDrag(ev,n){drag=n;dragMoved=false;n.fixed=true;ev.preventDefault();}
+
+// CSV loader (edges)
+document.getElementById('fg-csv').addEventListener('change',ev=>{const f=ev.target.files[0];if(!f)return;const rd=new FileReader();
+  rd.onload=()=>{try{const L=rd.result.split(/\r?\n/).filter(x=>x.trim());const st=/^source\s*,/i.test(L[0])?1:0;
+    const ids=new Set(nodes.map(n=>n.id));
+    const pe=L.slice(st).map(x=>{const c=x.split(',');return{s:c[0].trim(),t:c[1].trim(),w:+c[2],sign:(c[3]||'positive').trim()==='negative'?-1:1,lag:+(c[4]||0),type:(c[5]||'signal').trim()};})
+      .filter(l=>ids.has(l.s)&&ids.has(l.t)&&!isNaN(l.w));
+    if(pe.length){links=pe;rebuildAdj();renderGraph();recomputeDiag();clearDiag();restyle();draw();alpha=1;}}catch(err){alert('CSV parse error: '+err.message);}};
+  rd.readAsText(f);});
+
+// ===== Diagnose mode =====
+let diagnoseMode=false,dragMoved=false,selActive=false,pureSrc=new Set();
+const inbound=new Map(nodes.map(n=>[n.id,[]]));
+function buildInbound(){inbound.forEach(v=>v.length=0);links.forEach(l=>{if(inbound.has(l.t))inbound.get(l.t).push(l);});}
+function recomputeDiag(){buildInbound();pureSrc=new Set(nodes.filter(n=>!links.some(l=>l.t===n.id)).map(n=>n.id));}
+recomputeDiag();
+const nm=id=>esc(N.get(id).label);
+const diagPanel=document.getElementById('fg-diag'),diagBtn=document.getElementById('fg-diagBtn');
+diagBtn.addEventListener('click',()=>{diagnoseMode=!diagnoseMode;diagBtn.classList.toggle('on',diagnoseMode);diagBtn.textContent=diagnoseMode?'Diagnose mode: ON — click a node':'Diagnose mode: OFF';if(!diagnoseMode)clearDiag();});
+function rootLevers(id){const best={},seenAcc={},st=[[id,1]];
+  while(st.length){const pr=st.pop(),x=pr[0],acc=pr[1];
+    for(const l of links){if(l.t!==x)continue;const na=acc*Math.abs(l.w);
+      if(pureSrc.has(l.s)&&na>(best[l.s]||0))best[l.s]=na;
+      if(na>(seenAcc[l.s]||0)+1e-6){seenAcc[l.s]=na;st.push([l.s,na]);}}}
+  return Object.entries(best).sort((a,b)=>b[1]-a[1]).slice(0,8);}
+function diagnose(id){selActive=true;
+  const sn=new Set([id]),se=new Set(),stk=[id];
+  while(stk.length){const x=stk.pop();for(const l of links){if(l.t===x){se.add(l);if(!sn.has(l.s)){sn.add(l.s);stk.push(l.s);}}}}
+  nodes.forEach(n=>{const g=nodeEls.get(n.id).g,inS=sn.has(n.id);g.classList.toggle('dimt',!inS);g.classList.toggle('hl',inS);});
+  edgeEls.forEach(ln=>ln.classList.toggle('dim',!se.has(ln._l)));
+  const direct=links.filter(l=>l.t===id).sort((a,b)=>b.w-a.w),roots=rootLevers(id),node=N.get(id);
+  const neg=direct.filter(l=>l.sign<0).map(l=>nm(l.s));/* nm() already esc'd */
+  diagPanel.innerHTML='<div class="dx" id="fg-diagClose">×</div>'+
+    '<div class="dh"><b>'+esc(node.label)+'</b><span>'+esc(node.layer.toUpperCase())+'</span></div>'+
+    '<div class="dd">'+esc(node.def)+'</div>'+
+    '<div class="dl">If this is off, check (strongest first)</div><ol>'+
+    (direct.map(l=>'<li><span>'+nm(l.s)+'</span><em class="'+(l.sign<0?'n':'p')+'">'+(l.sign<0?'−':'+')+l.w+(l.lag>=1?' · ~'+Math.round(l.lag)+'wk':'')+'</em></li>').join('')||'<li>—</li>')+'</ol>'+
+    (neg.length?'<div class="warn">⚠ Culprit when HIGH: '+neg.join(', ')+'</div>':'')+
+    '<div class="dl">Levers to pull (root inputs)</div><ol>'+
+    (roots.map(r=>'<li><span>'+nm(r[0])+'</span><em>'+r[1].toFixed(2)+'</em></li>').join('')||'<li>—</li>')+'</ol>';
+  diagPanel.style.display='block';
+  document.getElementById('fg-diagClose').onclick=clearDiag;}
+function clearDiag(){selActive=false;nodes.forEach(n=>{const g=nodeEls.get(n.id).g;g.classList.remove('dimt');g.classList.remove('hl');});edgeEls.forEach(ln=>ln.classList.remove('dim'));diagPanel.style.display='none';}
+
+// ===== boot: layout renders immediately, no physics =====
+rebuildAdj();renderGraph();recomputeDiag();restyle();fitView();draw();loop();
+})();
+</script>

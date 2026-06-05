@@ -7,7 +7,7 @@ It scores every lever across the entire funnel (TOF → MOF → BOF → AOV → 
 ## Install
 
 ```
-/plugin marketplace add tdeeh8/marketing-funnel
+/plugin marketplace add marketing-funnel
 /plugin install marketing-funnel@marketing-funnel
 ```
 
@@ -15,8 +15,9 @@ It scores every lever across the entire funnel (TOF → MOF → BOF → AOV → 
 
 | Command | What it does |
 |---|---|
-| `/funnel [client]` | Full run → ranked levers for revenue + profit, grounded plays, HTML gap brief |
+| `/funnel [client]` | Full run → ranked levers for revenue + profit, grounded plays, HTML gap brief + embedded live graph |
 | `/funnel revenue [client]` or `/funnel profit [client]` | Same, single ranking |
+| `/funnel backfill [client] [N weeks]` | Seed 12 weeks of history to unlock noise floors and trend tracking on day one |
 | `/funnel diagnose <metric> [client]` | One metric is off → upstream walk to the root levers |
 | `/funnel explain` | Explains the model and structural sensitivity ranking, no data pull |
 
@@ -26,8 +27,8 @@ Natural-language triggers also work: "what's my biggest lever", "where should I 
 
 - **Databox MCP** connected (Shopify/BigCommerce, GA4, Google Ads, Meta Ads data sources) — financial truth comes from Shopify, not paid attribution
 - **Meta Ads MCP** (optional but recommended) — unlocks hook/hold/watch-time creative levers
-- Triple Whale / Klaviyo MCPs (optional) — more measurable levers
-- Python 3 for the scoring, verification, and report scripts
+- Klaviyo MCP via Databox connector (optional) — email/SMS levers
+- Python 3 for the scoring, verification, report, and graph scripts
 
 No ecommerce platform connected at all? The skill says so and labels everything directional rather than inventing numbers.
 
@@ -39,6 +40,7 @@ No ecommerce platform connected at all? The skill says so and labels everything 
 - Every recommended play names only campaigns/flows/offers that exist in the account's pulled inventory
 - `scripts/verify.py` enforces all of the above and must exit 0 before any report is built
 - An outcomes log self-calibrates predictions per account over time
+- An embedded live funnel graph tracks every node period-over-period, applies per-node noise floors (learned from weekly history), and highlights real moves vs variance — built by `scripts/build_graph.py` and injected into every report
 
 ## Structure
 
@@ -48,8 +50,9 @@ plugins/marketing-funnel/
 ├── commands/funnel.md          ← /funnel command
 └── skills/funnel/
     ├── SKILL.md                ← the orchestrator
-    ├── references/             ← methodology, benchmarks, funnel graph (88 nodes), data-layer notes
-    └── scripts/                ← score.py, verify.py, build_report.py, calibrate.py
+    ├── references/             ← methodology, benchmarks, funnel graph (88 nodes), data-layer notes, graph template + layout
+    ├── scripts/                ← score.py, verify.py, build_report.py, calibrate.py, build_graph.py
+    └── tests/                  ← test_build_graph.py
 ```
 
 ## License

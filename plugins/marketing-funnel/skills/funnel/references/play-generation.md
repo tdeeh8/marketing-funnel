@@ -6,7 +6,7 @@ A "play" is a specific move tied to the account's live setup. The difference bet
 
 For each top lever, pull the relevant inventory (not just the headline metric):
 - **Paid levers** → Meta/Google campaign structure: campaign names, active creative count, frequency, audience type, status. (Meta MCP / Databox; reuse `/ads` data layer.)
-- **List/email/retention levers** → Klaviyo flow inventory: which flows exist and their on/off status (Welcome, Abandoned Checkout, Win-back, Replenishment, etc.).
+- **List/email/retention levers** → no flow-level inventory is available via Databox; do NOT invent flow names. Write plays at capability level ("build an abandoned-checkout flow") unless a flow's existence is evidenced in pulled data, and flag the missing ESP connection in flags.json.
 - **AOV levers** → Shopify offer setup: bundles live, upsell app present, subscription offered, free-ship threshold.
 
 Write these to `clients/{Client}/funnel/{date}/inventory.csv` (`entity_id,type,name,attrs`). This file is the grounding set.

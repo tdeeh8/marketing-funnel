@@ -8,7 +8,7 @@ funnel heat strip, opportunity ladder, and a per-lever drawer with the why-chain
 and the grounded plays.
 
 Usage:
-  python3 build_report.py --levers levers.json --plays plays.json --client "Acme Co" --out report.html
+  python3 build_report.py --levers levers.json --plays plays.json --client "Acme" --out report.html
 """
 import csv, os, json, argparse, collections
 
@@ -44,11 +44,11 @@ def main():
                          "Used to frame coverage against an achievable target instead of all 88 nodes.")
     ap.add_argument("--baseline-source", default=None,
                     help="label of the revenue baseline source, e.g. 'Shopify' or 'GA4'. If it is NOT a "
-                         "financial-truth source (Shopify / Triple Whale / BigCommerce), every dollar figure "
+                         "financial-truth source (Shopify / BigCommerce), every dollar figure "
                          "is flagged DIRECTIONAL in the report so a GA4-undercounted number never reads as exact.")
     ap.add_argument("--out", required=True)
     a = ap.parse_args()
-    TRUTH = {"shopify", "triplewhale", "triple whale", "tw", "bigcommerce"}
+    TRUTH = {"shopify", "bigcommerce"}
     bsrc = a.baseline_source
     directional = bool(bsrc) and bsrc.strip().lower() not in TRUTH
 
@@ -246,7 +246,7 @@ function render(){
   <div class="hd"><span style="font-size:15px;font-weight:500">Funnel gap brief — ${D.client}</span>
    <span style="font-size:12px;color:var(--mut)">${D.meta.window||''} coverage ${Math.round(D.meta.coverage*100)}% · CM2 ${Math.round(D.meta.cm2*100)}% · baseline ${f(D.meta.baseline)}/mo${D.baseline_source?' ('+D.baseline_source+')':''}</span></div>
   ${D.directional?`<div style="border:1px solid rgba(183,121,31,.35);background:rgba(183,121,31,.10);border-radius:10px;padding:8px 12px;margin-bottom:14px;font-size:12.5px;color:#8a5a12">
-   <b>Directional dollars.</b> The revenue baseline comes from <b>${D.baseline_source}</b>, not a financial source of truth (Shopify / Triple Whale). Every $ below is a relative-priority signal, not an exact forecast — connect Shopify to make these exact.</div>`:''}
+   <b>Directional dollars.</b> The revenue baseline comes from <b>${D.baseline_source}</b>, not a financial source of truth (Shopify / BigCommerce). Every $ below is a relative-priority signal, not an exact forecast — connect Shopify to make these exact.</div>`:''}
   <div class="cards">
    <div class="card"><p class="lbl">Biggest revenue lever</p><div style="font-size:17px;font-weight:500">${D.rev_top.label} <span style="font-size:12px;color:var(--mut)">· ${D.rev_top.layer}</span></div>
      <div style="font-size:13px;color:#2f6fd0;margin-top:2px">${f(D.rev_top.rev)}/mo · ${gv(D.rev_top.cur)}→${gv(D.rev_top.bench)}</div></div>
